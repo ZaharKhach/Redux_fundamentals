@@ -8,6 +8,4 @@ const rootReducer = combineReducers({
     filtersReducer
 });
 
-// console.log(rootReducer)
-
 export default rootReducer;

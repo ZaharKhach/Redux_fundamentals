@@ -3,7 +3,7 @@ import { client } from "../../api/client";
 import { todoAdded, todosLoaded, todosLoading } from "../actions/actions";
 import { StatusFilters } from "../filters/filterSlice";
 
-import { createSelector } from "reselect";
+import { createSelector } from "@reduxjs/toolkit";
 
 const initialState = {
     loadingStatus: 'idle',
