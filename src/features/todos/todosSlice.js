@@ -1,64 +1,107 @@
 import { client } from "../../api/client";
 
-import { todoAdded, todosLoaded } from "../actions/actions";
+import { todoAdded, todosLoaded, todosLoading } from "../actions/actions";
 import { StatusFilters } from "../filters/filterSlice";
 
 import { createSelector } from "reselect";
 
-const initialState = [];
+const initialState = {
+    loadingStatus: 'idle',
+    todos: {}
+};
 
 
 export default function todosReducer(state = initialState, action) {
     switch (action.type) {
 
         case "todos/todoAdded": {
-            return [
+            const todo = action.payload
+            return {
                 ...state,
-                action.payload
-            ];
+                todos: {
+                    ...state.todos,
+                    [todo.id]: todo
+                }
+            };
         }
         case "todos/todoToggled": {
-            return state.map(item => {
-                if (item.id !== action.payload) {
-                    return item;
+            const todoId = action.payload;
+            const todo = state.todos[todoId]
+            return {
+                ...state,
+                todos: {
+                    ...state.todos,
+                    [todoId]: {
+                        ...todo,
+                        completed: !todo.completed
+                    }
                 }
-
-                return {
-                    ...item,
-                    completed: !item.completed
-                }
-            });
+            }
         }
         case "todos/colorSelected": {
             const { color, todoId } = action.payload
-            return state.map(item => {
-                if (item.id !== todoId) {
-                    return item;
+            const todo = state.todos[todoId];
+            return {
+                ...state,
+                todos: {
+                    ...state.todos,
+                    [todoId]: {
+                        ...todo,
+                        color
+                    }
                 }
-
-                return {
-                    ...item,
-                    color
-                }
-            })
+            }
         }
         case "todos/todoDeleted": {
-            return state.filter(item => item.id !== action.payload)
+            const newTodos = { ...state.todos }
+            delete newTodos[action.payload];
+            return {
+                ...state,
+                todos: newTodos
+            }
         }
         case "todos/allCompleted": {
-            return state.map(item => {
-                return { ...item, completed: true }
-
+            const newTodos = { ...state.todos }
+            Object.values(newTodos).forEach(todo => {
+                newTodos[todo.id] = {
+                    ...todo,
+                    completed: true
+                }
             })
+            return {
+                ...state,
+                todos: newTodos
+            }
         }
         case "todos/completedCleared": {
-            return state.filter(item => !item.completed)
+            const newTodos = { ...state.todos };
+            Object.values(newTodos).map(todo => {
+                if (todo.completed) {
+                    delete newTodos[todo.id]
+                }
+
+            })
+            return {
+                ...state,
+                todos: newTodos
+            }
+        }
+        case "todos/todosLoading": {
+            return {
+                ...state,
+                loadingStatus: 'loading'
+            }
         }
         case "todos/todosLoaded": {
-            return [
+            const newTodos = { ...state.todos }
+            action.payload.forEach(todo => {
+                newTodos[todo.id] = todo
+            })
+            return {
                 ...state,
-                ...action.payload
-            ]
+                loadingStatus: 'idle',
+                todos: newTodos
+            }
         }
         default: {
             return state;
@@ -68,6 +111,7 @@ export default function todosReducer(state = initialState, action) {
 
 //Thunk function
 export const fetchTodos = () => async dispatch => {
+    dispatch(todosLoading())
     const response = await client.get("fakeApi/todos");
     dispatch(todosLoaded(response.todos));
 }
@@ -85,14 +129,15 @@ export function saveMeTodo(text) {
     }
 }
 
-//
 
-//we are doing it cause every time when some value in todos array change
-//func map generate new arr and re-rendering started and also it has deeply equality check
-//and THIS THING was created only for creating selectors exapt shallowEqual 
+const selectTodoArray = state => state.todosReducer.todos;
+export const selectTodos = createSelector(
+    selectTodoArray,
+    (todoArray) => Object.values(todoArray)
+)
 
 export const selectFilteredTodos = createSelector(
-    (state) => state.todosReducer,
+    selectTodos,
     (state) => state.filtersReducer,
 
     (todos, { status, colors }) => {

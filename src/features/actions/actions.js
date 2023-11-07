@@ -18,9 +18,13 @@ export const onStatusChangeAction = (status) => {
     }
 }
 export const onColorChangeAction = (color, changeType) => {
-    console.log(color)
     return {
         type: "filters/colorFilterChanged",
         payload: {color, changeType}
+    }
+}
+export const todosLoading = () => {
+    return {
+        type: "todos/todosLoading"
     }
 }

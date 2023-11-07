@@ -6,12 +6,13 @@ import { ReactComponent as TimesSolid } from './times-solid.svg'
 
 import { availableColors, capitalize } from '../filters/colors'
 
+import { selectTodos } from './todosSlice'
+
 const TodoListItem = ({ id }) => {
-  const todo = useSelector(state => state.todosReducer.find(todo => todo.id === id));
+  const todosArr = useSelector(selectTodos)
+  const todo = useSelector(state => todosArr.find(todo => todo.id === id));
   const dispatch = useDispatch()
   const { text, completed, color } = todo;
-  console.log('complited',completed);
-  console.log('color', color)
 
   const handleCompletedChanged = () => {
     dispatch({ type: 'todos/todoToggled', payload: todo.id });
