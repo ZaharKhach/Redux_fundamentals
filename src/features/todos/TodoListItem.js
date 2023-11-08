@@ -6,7 +6,12 @@ import { ReactComponent as TimesSolid } from './times-solid.svg'
 
 import { availableColors, capitalize } from '../filters/colors'
 
-import { selectTodos } from './todosSlice'
+import {
+  selectTodos,
+  todoDeleted,
+  todoColorSelected,
+  todoToggled
+} from './todosSlice'
 
 const TodoListItem = ({ id }) => {
   const todosArr = useSelector(selectTodos)
@@ -15,17 +20,17 @@ const TodoListItem = ({ id }) => {
   const { text, completed, color } = todo;
 
   const handleCompletedChanged = () => {
-    dispatch({ type: 'todos/todoToggled', payload: todo.id });
+    dispatch(todoToggled(todo.id));
   }
 
   const handleColorChanged = (e) => {
     const todoId = todo.id
     const color = e.target.value
-    dispatch({ type: "todos/colorSelected", payload: {color, todoId} })
+    dispatch(todoColorSelected({color, todoId}))
   }
 
   const onDelete = () => {
-    dispatch({ type: "todos/todoDeleted", payload: todo.id })
+    dispatch(todoDeleted(todo.id))
   }
 
   const colorOptions = availableColors.map((c) => (

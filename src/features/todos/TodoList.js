@@ -15,7 +15,6 @@ const TodoList = () => {
   const loadingStatus = useSelector(({ todosReducer }) => todosReducer.loadingStatus);
 
   if (loadingStatus === 'loading') {
-    console.log('join')
     return (
         <div className="todo-list">
           <div className="loader"></div>

@@ -83,7 +83,6 @@ const Footer = () => {
   const { colors, status } = useSelector(state => state.filtersReducer);
   const todosArr = useSelector(selectTodos)
   const dispatch = useDispatch()
-  console.log(status)
   const todosRemaining = useSelector(state => {
     const todos = todosArr.filter(item => item.completed === true);
     return todos.length

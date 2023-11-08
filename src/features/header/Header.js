@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 
-import { saveMeTodo } from '../todos/todosSlice';
+import { saveNewTodo } from '../todos/todosSlice';
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const Header = () => {
     if (e.key === 'Enter' && trimmedText) {
       setLoadingStatus('loading')
       //dispatch the async action
-      await dispatch(saveMeTodo(trimmedText))
+      await dispatch(saveNewTodo(trimmedText))
       //update our state value
       setText('')
       setLoadingStatus('idle')
